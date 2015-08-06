@@ -1,0 +1,17 @@
+html
+    head
+        title!= title
+
+        script(src="js/mt-module.js", entry="js/init.js", waitForDom="true")
+        link(rel="stylesheet", type="text/css", href="style/main.css")
+
+    body
+
+        h1!= message
+        div(id="login_name_container")!= user_login
+        form(action="/logout", method="GET")
+            input(type="submit", value="Log Off!")
+
+        button(id="queuestart") Queue up!
+        button(id="queueend") Leave Queue!
+        canvas(id="main_canvas" width="600" height="400")

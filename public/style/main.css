@@ -1,0 +1,15 @@
+button {
+    height: 50px;
+    width: 80px;
+}
+
+div#textcontainer {
+    height: 500px;
+    width: 300px;
+    background-color: grey;
+}
+
+canvas {
+    width: 600px;
+    height: 500px;
+}

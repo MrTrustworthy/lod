@@ -1,0 +1,10 @@
+html
+    head
+        title!= title
+    body
+        p!= info_message
+            
+        form(action="/login", method="POST")
+            input(type="text" id="login_name" name="login_name" autofocus)
+            input(type="text" id="login_password" name="login_password")
+            input(type="submit" value="Log In!")

@@ -1,0 +1,10 @@
+html
+    head
+        title!= title
+    body
+        p!= info_message
+            
+        form(action="/register", method="POST")
+            input(type="text" id="register_name" name="register_name")
+            input(type="text" id="register_password" name="register_password")
+            input(type="submit", value="Sign up!")
