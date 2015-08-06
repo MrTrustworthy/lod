@@ -1,11 +1,3 @@
-var http = require('http');
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Hello, its really! working!\n');
-}).listen(61768, "127.0.0.1");
-console.log('Server running at http://127.0.0.1:61768/');
-return;
-
 /**
  * Created by MT on 05.07.2015.
  */
@@ -76,7 +68,7 @@ app.use(function(req, res, next) {
 
 
 // run server
-var server = app.listen(3000, function(){
+var server = app.listen(61768, function(){
     console.log("server up and running!");
 });
 // let sockets listen on server
