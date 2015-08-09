@@ -1,5 +1,5 @@
 
-var THREE = require("/js/libs/three.js");
+var THREE = require("./libs/three");
 
 var VisualManager = function(){
 

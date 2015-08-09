@@ -2,9 +2,9 @@
  * Created by MrTrustworthy on 03.08.2015.
  */
 
-var VisualManager = require("/js/visualmanager.js");
-var InputHandler = require("/js/inputhandler.js");
-var SOCKETEVENTS = require("/socketevents.js");
+var VisualManager = require("./visualmanager");
+var InputHandler = require("./inputhandler");
+var SOCKETEVENTS = require("../socketevents");
 
 
 var Game = function(){

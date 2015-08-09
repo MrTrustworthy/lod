@@ -1,6 +1,8 @@
 /**
  * Created by MT on 05.07.2015.
  */
+
+var PORT = require("./shared/socketevents").PORT;
 var express = require('express');
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
@@ -68,8 +70,8 @@ app.use(function(req, res, next) {
 
 
 // run server
-var server = app.listen(61768, function(){
-    console.log("server up and running!");
+var server = app.listen(PORT, function(){
+    console.log("server up and running on port", PORT);
 });
 // let sockets listen on server
 socket.listen(server);

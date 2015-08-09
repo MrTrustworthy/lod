@@ -14,7 +14,7 @@ var ClientDTO = require("../utils/Objects/clientDTO");
  */
 var QueueHandler = function QueueHandler(popAmount, popInterval) {
 
-    this.popAmount = popAmount || 2;
+    this.popAmount = popAmount || 1;
     this.popInterval = popInterval || 2000;
 
     this.clients = [];

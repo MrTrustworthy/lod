@@ -1,7 +1,7 @@
 /**
  * Created by MrTrustworthy on 02.08.2015.
  */
-var MTEvent = require("/js/mt-event.js");
+var MTEvent = require("./mt-event");
 
 var INPUT_CONFIG = new Map();
 INPUT_CONFIG.set();

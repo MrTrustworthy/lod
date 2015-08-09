@@ -2,10 +2,10 @@
  * Created by MrTrustworthy on 01.08.2015.
  */
 
-var Deferred = require("/js/mt-promise.js");
-var Game = require("/js/game.js");
-var io = require("/js/libs/socket.io.js");
-var SOCKETEVENTS = require("/socketevents.js");
+var Deferred = require("./mt-promise");
+var Game = require("./game");
+var io = require("./libs/socket.io");
+var SOCKETEVENTS = require("../socketevents");
 
 /**
  * A user is the entity that connects to the queue and joins a activity

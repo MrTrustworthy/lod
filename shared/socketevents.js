@@ -5,6 +5,9 @@
 var socketevents =  {
     // those are socket events to emit/listen to
     SOCKET_PATH: "/game",
+    SOCKET_PATH_NOSLASH: "game",
+
+    PORT: "61768",
 
     CONNECT: "connect",
     CONNECTION: "connection",
