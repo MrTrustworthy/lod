@@ -1,6 +1,7 @@
 /**
  * Created by MrTrustworthy on 01.08.2015.
  */
+var logger = require("../utils/mt-log")("main-log");
 var SOCKETEVENTS = require("../shared/socketevents");
 var Activity = require("../activities/activity");
 
@@ -44,7 +45,7 @@ Session.prototype.addClients = function(clients){
         // on socket disconnect
         client.socket.on(SOCKETEVENTS.DISCONNECT, function(){
             client.disconnected = true;
-            console.log("Client", client.name, "disconnected, don't know what to do, trying to stop");
+            logger.log("#Session: Client", client.name, "disconnected, don't know what to do, trying to stop");
             this.pause();
         }.bind(this));
 
@@ -71,7 +72,7 @@ Session.prototype.start = function start() {
     var clientNames = this.clients.map(function (client) {
         return client.name;
     });
-    console.log("#Session: started with those clients:", clientNames);
+    logger.log("#Session: started with those clients:", clientNames);
 
     // now that the activity is set up, send the initial status to the clients
     this.clients.forEach(function(client){
@@ -80,7 +81,7 @@ Session.prototype.start = function start() {
     }.bind(this));
 
 
-    console.log("#Session: starting update view routine");
+    logger.log("#Session: starting update view routine");
     this._intervalReference = setInterval(this._update.bind(this), this.updateInterval);
 
 };
@@ -99,7 +100,7 @@ Session.prototype._update = function(){
 
     if(!viewData) return;
 
-    //console.log("#Session: Updating clients with new view", Object.keys(this.clients));
+    //logger.log("#Session: Updating clients with new view", Object.keys(this.clients));
 
     this.clients.forEach(function(client){
         client.socket.emit(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, viewData);
@@ -114,10 +115,10 @@ Session.prototype._update = function(){
  */
 Session.prototype.pause = function(){
     if(!this._intervalReference) {
-        console.log("#Session: can't stop session that isnt running");
+        logger.log("#Session: can't stop session that isnt running");
         return;
     }
-    console.log("#Session: Clearing session update interval!");
+    logger.log("#Session: Clearing session update interval!");
     clearInterval(this._intervalReference);
     delete this._intervalReference;
 };

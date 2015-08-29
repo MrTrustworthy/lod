@@ -1,3 +1,4 @@
+var logger = require("../utils/mt-log")("main-log");
 var DBCONST = require("../utils/constants").DB;
 var Deferred = require("../shared/js/mt-promise");
 var sqlite3 = require('sqlite3').verbose();
@@ -7,9 +8,9 @@ var fs = require("fs");
 fs.exists(DBCONST.NAME, function(exists){
     var db = new sqlite3.Database(DBCONST.NAME);
     if(exists){
-        console.log("DB already existing, skipping new creation");
+        logger.log("#DB: DB already existing, skipping new creation");
         db.each("SELECT rowid, name, password, creation_date FROM users", function(err, row) {
-            console.log(row.rowid, ":", row.name, ": ", row.password, ":", row.creation_date);
+            logger.log(row.rowid, ":", row.name, ": ", row.password, ":", row.creation_date);
         });
         return;
     }
@@ -33,7 +34,7 @@ var openDB = (function(){
                 db.serialize();
                 deferred.resolve(db);
             } else {
-                console.log("couldn't open DATABASE!! ERROR:", errorObj);
+                logger.log("#DB: couldn't open DATABASE!! ERROR:", errorObj);
                 deferred.reject(errorObj);
             }
         }
@@ -65,7 +66,7 @@ module.exports.createUser = function(name, password){
 module.exports.checkLogin = function(name, password){
     var deferred = new Deferred();
     openDB.then(function(db){
-        //console.log("trying to confirm login:", name, password);
+        //logger.log("trying to confirm login:", name, password);
         // asking for a user with the given name & password
         // if there is one, we can assume login is correct
         db.get(
@@ -73,7 +74,7 @@ module.exports.checkLogin = function(name, password){
             [name, password],
             function(err, row){
                 // interpret the result and respond accordingly
-                //console.log("got row", row);
+                //logger.log("got row", row);
                 if(err || !row) deferred.reject([err, row]);
                 else deferred.resolve();
             }

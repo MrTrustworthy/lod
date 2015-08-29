@@ -1,6 +1,7 @@
 /**
  * Created by MrTrustworthy on 02.08.2015.
  */
+var logger = require("../utils/mt-log")("main-log");
 var MTEvent = require("../shared/js/mt-event");
 
 var Activity = function () {
@@ -80,7 +81,7 @@ Activity.prototype.getUpdateView = function () {
  * @param input
  */
 Activity.prototype.setUpdatedInput = function (client, input) {
-    //console.log("#Activity got updated input!");
+    //logger.log("#Activity got updated input!");
     this.inputBuffer.push({
         name: client.name,
         input: input

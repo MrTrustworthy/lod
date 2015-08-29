@@ -1,7 +1,7 @@
 /**
  * Created by MT on 05.07.2015.
  */
-
+var logger = require("./utils/mt-log")("main-log");
 var PORT = require("./shared/socketevents").PORT;
 var express = require('express');
 var bodyParser = require("body-parser");
@@ -11,8 +11,8 @@ var favicon = require("serve-favicon");
 
 var app = express();
 
-var routeSessions = require("./webserver/session").router;
-var routeMain = require("./webserver/main").router;
+var routeSessions = require("./webserver/session-router").router;
+var routeMain = require("./webserver/main-router").router;
 
 var socket = require("./sockethandler/communicator").io;
 
@@ -64,14 +64,14 @@ app.use("/", routeSessions);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  console.log("Someone 404'd!", req.path);
+  logger.log("Someone 404'd!", req.path);
   res.send("Couldn't find the page, really sorry about that");
 });
 
 
 // run server
 var server = app.listen(PORT, function(){
-    console.log("server up and running on port", PORT);
+    logger.log("server up and running on port", PORT);
 });
 // let sockets listen on server
 socket.listen(server);

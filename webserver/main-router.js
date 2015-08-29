@@ -1,3 +1,4 @@
+var logger = require("../utils/mt-log")("main-log");
 var express = require('express');
 var router = express.Router();
 

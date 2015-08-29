@@ -1,4 +1,4 @@
-
+var logger = require("../utils/mt-log")("main-log");
 var express = require('express');
 var router = express.Router();
 
@@ -35,7 +35,7 @@ router.get(PATH.LOGIN, function(request, response) {
 router.post(PATH.LOGIN, function(request, response) {
     var name = request.body.login_name;
     var password = request.body.login_password;
-    console.log("trying to login with", name, password);
+    logger.log("#Session-router: trying to login user", name, password);
 
     // check for form entries
     if(!name || !password) return response.redirect("/login?error=empty");
@@ -49,7 +49,7 @@ router.post(PATH.LOGIN, function(request, response) {
         return response.redirect("/");
     }, function(err){
         // login was incorrect
-        console.log("Login failed:", err);
+        logger.log("#Session-router: Login failed:", err);
         return response.redirect("/login?error=failed");
     });
 
@@ -64,7 +64,7 @@ router.post(PATH.LOGIN, function(request, response) {
  * @return {None}                   just used to abort further function calls
  */
 router.get(PATH.LOGOUT, function(request, response){
-    console.log("logging out", request.session[CONST.SESSION.LOGIN_NAME]);
+    logger.log("#Session-router: logging out", request.session[CONST.SESSION.LOGIN_NAME]);
     // remove session flag
     delete request.session;
     response.redirect("/login");
@@ -98,7 +98,7 @@ router.get(PATH.REGISTER, function(request, response) {
 router.post(PATH.REGISTER, function(request, response) {
     var name = request.body.register_name;
     var password = request.body.register_password;
-    console.log("trying to register with", name, password);
+    logger.log("#Session-router: trying to register new user with", name, password);
 
     if(!name || !password) return response.redirect("/register?error=empty");
 
@@ -109,7 +109,7 @@ router.post(PATH.REGISTER, function(request, response) {
         return response.redirect("/login");
     }, function(err){
         // registering failed
-        console.log("Registering failed:", err);
+        logger.error("#Session-router: Registering failed:", err);
         return response.redirect("/register?error=failed");
     });
 

@@ -1,4 +1,4 @@
-var CONST = require("../utils/constants");
+var logger = require("../utils/mt-log")("main-log");
 var SOCKETEVENTS = require("../shared/socketevents");
 var Matchmaker = require("./matchmaker");
 var Session = require("./session");
@@ -22,7 +22,7 @@ SessionHandler.prototype.watch = function(matchmaker){
     if(!(matchmaker instanceof Matchmaker)) throw TypeError("This is not a Matchmaker!");
     this.matchmaker = matchmaker;
     this.matchmaker.startChecking();
-    this.matchmaker.on(CONST.MATCHMAKING.MATCH_FOUND_EVT, this.handleMatch.bind(this));
+    this.matchmaker.on(SOCKETEVENTS.MATCHMAKING.MATCH_FOUND, this.handleMatch.bind(this));
 };
 
 /**
@@ -31,7 +31,7 @@ SessionHandler.prototype.watch = function(matchmaker){
  */
 SessionHandler.prototype.handleMatch = function(clients){
 
-    console.log("#SessionHandler recieved a match with", clients.length, "clients");
+    logger.log("#SessionHandler recieved a match with", clients.length, "clients");
 
     var session = new Session();
     this.sessions.push(session);

@@ -1,3 +1,4 @@
+var logger = require("../utils/mt-log")("main-log");
 var EventHandler = require("../shared/js/mt-event");
 var CONST = require("../utils/constants");
 var SOCKETEVENTS = require("../shared/socketevents");
@@ -37,13 +38,13 @@ QueueHandler.prototype = Object.create(Matchmaker.prototype);
  * @private
  */
 QueueHandler.prototype.__handlerFunction = function (socket) {
-    console.log("Someone connected to the Socket");
+    logger.log("#Queuehandler: Someone connected to the Socket");
 
     // TODO find out how to get the users name from his session
     var client = new ClientDTO(null, socket);
 
     socket.on(SOCKETEVENTS.MATCHMAKING.JOIN_MATCHMAKING, function (data) {
-        console.log("Client wants to join queue:", data.login_name, socket.id);
+        logger.log("#Queuehandler: Client wants to join queue:", data.login_name, socket.id);
 
         client.setName(data.login_name);
 
@@ -52,7 +53,7 @@ QueueHandler.prototype.__handlerFunction = function (socket) {
 
         // handle user disconnect from queue by removing him
         var leaveQueueFunc = function leaveQueueFunc() {
-            console.log("one of our clients (", client.name, ":", client.socket.id, ") disconnected");
+            logger.log("#Queuehandler: one of our clients (", client.name, ":", client.socket.id, ") disconnected");
             this._removeClient(client);
             this.__printClients();
         }.bind(this);
@@ -77,7 +78,7 @@ QueueHandler.prototype._removeClient = function (client) {
     });
 
     if (i === -1) {
-        console.warn("#QUEUEHANDLER: Can't remove client that isn't in queue)");
+        logger.warn("#Queuehandler: Can't remove client that isn't in queue)");
         return false;
     }
 
@@ -93,7 +94,7 @@ QueueHandler.prototype._removeClient = function (client) {
  */
 QueueHandler.prototype.__checkForPop = function () {
     if (this.clients.length >= this.popAmount) {
-        console.log("#Queuehandler: Enough Clients for Match in Queue");
+        logger.log("#Queuehandler: Enough Clients for Match in Queue");
         var matchedClients = this.clients.splice(0, this.popAmount);
 
 
@@ -111,10 +112,10 @@ QueueHandler.prototype.__checkForPop = function () {
  * @private
  */
 QueueHandler.prototype.__printClients = function () {
-    console.log("Current Clients in Queue:");
-    if (this.clients.length === 0) console.log("----NONE----");
+    logger.log("#Queuehandler: Current Clients in Queue:");
+    if (this.clients.length === 0) logger.log("----NONE----");
     this.clients.forEach(function (client) {
-        console.log(client.toString());
+        logger.log(client.toString());
     });
 };
 
@@ -134,7 +135,7 @@ QueueHandler.prototype.startChecking = function () {
  */
 QueueHandler.prototype.stopChecking = function () {
     if (!this.intervalObj) {
-        console.warn("CANT CLEAR INTERVAL; DIDN'T START INTERVAL");
+        logger.warn("#Queuehandler: CANT CLEAR INTERVAL; DIDN'T START INTERVAL");
         return;
     }
     clearInterval(this.intervalObj);
