@@ -33,11 +33,11 @@ SessionHandler.prototype.handleMatch = function(clients){
 
     logger.log("#SessionHandler recieved a match with", clients.length, "clients");
 
-    var session = new Session();
+    var session = new Session(clients);
     this.sessions.push(session);
 
-    session.addClients(clients);
-    session.start();
+    //session.addClients();
+    //session.start();
 
 };
 

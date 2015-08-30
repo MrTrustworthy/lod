@@ -71,6 +71,7 @@ app.use(function(req, res, next) {
 
 // run server
 var server = app.listen(PORT, function(){
+    logger.log("******************************************************************");
     logger.log("server up and running on port", PORT);
 });
 // let sockets listen on server
