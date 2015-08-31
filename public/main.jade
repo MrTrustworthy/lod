@@ -12,6 +12,27 @@ html
         form(action="/logout", method="GET")
             input(type="submit", value="Log Off!")
 
-        button(id="queuestart") Queue up!
-        button(id="queueend") Leave Queue!
+        div(id="queue_container")
+            button(id="queuestart") Queue up!
+            button(id="queueend") Leave Queue!
+
+
+        div(id="ui_container")
+            table
+                thead
+                    th Name
+                    th Build
+                    th Def
+                    th Off
+                    th Turn
+                    th End Turn
+                tbody
+                    tr
+                        td(id="ui_table_name") NIX
+                        td(id="ui_table_build") NIX
+                        td(id="ui_table_def") NIX
+                        td(id="ui_table_off") NIX
+                        td(id="ui_table_turn") NIX
+                        td(id="ui_table_end_turn")
+
         canvas(id="main_canvas" width="600" height="400")

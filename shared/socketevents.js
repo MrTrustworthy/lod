@@ -28,6 +28,14 @@ var socketevents =  {
         INIT_VIEW: "init_view",
         UPDATE_VIEW: "update_view",
         NEW_INPUT: "new_input"
+    },
+    CLIENT: {
+        END_TURN: "end_turn",
+        CLICKED_ON_OBJECT: "clicked_on_object"
+    },
+    COMMAND: {
+        END_TURN: "end_turn",
+        BUILD: "build"
     }
 
 };

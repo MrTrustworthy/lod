@@ -1,11 +1,3 @@
-var defaultConfig = {
-    owner: "Neutral",
-    values: {
-        Off: 1,
-        Def: 1
-    }
-};
-
 
 var WorldObject = function (owner, attack, shield) {
 
@@ -21,7 +13,8 @@ WorldObject.prototype.toString = function () {
 WorldObject.prototype.toJSON = function () {
     return {
         owner: this.owner,
-        values: this.values
+        attack: this.attack,
+        shield: this.shield
     };
 };
 

@@ -13,8 +13,8 @@ var Session = function Session(clients) {
     gameConf = {
         players: clientNames,
         worldSize: {
-            x: 10,
-            y: 10
+            x: 20,
+            y: 20
         }
     };
     this.gameHandler = new GameHandler(gameConf);
@@ -30,17 +30,11 @@ var Session = function Session(clients) {
  *
  */
 Session.prototype.loadClients = function () {
-
-    //clients = (clients instanceof Array) ? clients : [clients];
-
     var clientNames = this.clients.map(function (client) {
         return client.name;
     });
 
-
     this.clients.forEach(function (client) {
-
-        //this.clients.push(client);
 
         // tell the clients we started the session
         client.socket.emit(
@@ -56,8 +50,7 @@ Session.prototype.loadClients = function () {
         // on socket disconnect
         client.socket.on(SOCKETEVENTS.DISCONNECT, function () {
             client.disconnected = true;
-            logger.log("#Session: Client", client.name, "disconnected, don't know what to do, trying to stop");
-            this.pause();
+            logger.log("#Session: Client", client.name, "disconnected, don't know what to do");
         }.bind(this));
 
         // HANDLE NEW INPUT
@@ -67,7 +60,6 @@ Session.prototype.loadClients = function () {
 
     }.bind(this));
 
-    //clients.forEach(_handleClientFunc.bind(this));
 
     return clientNames;
 

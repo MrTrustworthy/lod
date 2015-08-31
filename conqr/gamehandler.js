@@ -3,27 +3,16 @@ var logger = require("../utils/mt-log")("main-log");
 
 
 var handlerFunctions = {
-    endTurn: function () {
+    end_turn: function () {
         this.game.players.push(this.game.players.shift());
     },
     build: function (player, params) {
         //console.log("calling function with params:", arguments);
         this.game.build(player, params);
     }
-
-
 };
 
-var defaultConf = {
-    players: [
-        "player 1",
-        "player 2"
-    ],
-    worldSize: {
-        x: 7,
-        y: 7
-    }
-};
+
 
 /**
  *
@@ -31,50 +20,7 @@ var defaultConf = {
  * @constructor
  */
 var GameHandler = function (gameConfig) {
-    gameConfig = gameConfig || defaultConf;
     this.game = new Game(gameConfig);
-};
-
-/**
- *
- * @param playerName
- * @returns {boolean}
- */
-GameHandler.prototype.isTurnOf = function (playerName) {
-    return this.game.players[0].name === playerName;
-};
-
-/**
- *
- * @returns {{demo: string}}
- */
-GameHandler.prototype.getInitView = function () {
-    var map, players, turnOf, json;
-
-    map = this.game.map.toJSON();
-    players = this.game.players.map(function (player) {
-        return player.toJSON();
-    });
-
-    turnOf = this.game.players[0].name;
-
-    json = {
-        map: map,
-        players: players,
-        turnOf: turnOf
-    };
-    console.log("#Gamehandler: view looks like this", json);
-    return json;
-};
-
-/**
- *
- * @returns {{demo: string}}
- */
-GameHandler.prototype.getViewUpdate = function () {
-
-    return {};
-    //this.getInitView();
 };
 
 /**
@@ -93,14 +39,57 @@ GameHandler.prototype.handleCommand = function (player, command, params) {
         return false;
     }
     try {
-        handlerFunctions[command].call(this, player, JSON.parse(params));
+        handlerFunctions[command].call(this, player, params);
         return true;
     } catch (e) {
-        logger.warn("#Gamehandler: Sending a command went wrong and caused an error:", e.toString());
+        console.log("#Gamehandler: Sending a command went wrong and caused an error:", e.toString());
         return false;
     }
 
 };
+
+
+/**
+ *
+ * @param playerName
+ * @returns {boolean}
+ */
+GameHandler.prototype.isTurnOf = function (playerName) {
+    return this.game.players[0].name === playerName;
+};
+
+/**
+ *
+ * @returns {{map: (string|*|Object|String|{position, object, ressource}|{name, ressources}), players: (Array|*), turnOf: *}|*}
+ */
+GameHandler.prototype.getInitView = function () {
+    var map, players, turnOf, json;
+
+    map = this.game.map.toJSON();
+    players = this.game.players.map(function (player) {
+        return player.toJSON();
+    });
+
+    turnOf = this.game.players[0].name;
+
+    json = {
+        map: map,
+        players: players,
+        turnOf: turnOf
+    };
+    //console.log("#Gamehandler: view looks like this", json);
+    return json;
+};
+
+/**
+ *
+ * @returns {{demo: string}}
+ */
+GameHandler.prototype.getViewUpdate = function () {
+    return this.getInitView();
+};
+
+
 
 
 module.exports = GameHandler;

@@ -16,7 +16,7 @@ var InputHandler = function () {
 
 };
 
-InputHandler.prototype._startHandlers = function(domElement){
+InputHandler.prototype._startHandlers = function (domElement) {
     domElement = domElement || document;
     domElement.onmousedown = this._mouseClickHandlerFunc.bind(this);
     domElement.onmousemove = this._mouseMoveHandlerFunc.bind(this);
@@ -37,7 +37,7 @@ InputHandler.prototype._getClearBuffer = function () {
 };
 
 InputHandler.prototype.getInputBuffer = function () {
-    if(!this.isBufferDirty) return null;
+    if (!this.isBufferDirty) return null;
 
     var c = JSON.parse(JSON.stringify(this.currentBuffer));
     this.currentBuffer = this._getClearBuffer();
@@ -60,7 +60,7 @@ InputHandler.prototype._mouseMoveHandlerFunc = function (evt) {
 InputHandler.prototype._keyHandlerFunc = function (evt) {
     this.emit("inputChanged", this);
     this.isBufferDirty = true;
-    if(this.currentBuffer.keys.indexOf(evt.keyCode) === -1) this.currentBuffer.keys.push(evt.keyCode);
+    if (this.currentBuffer.keys.indexOf(evt.keyCode) === -1) this.currentBuffer.keys.push(evt.keyCode);
 };
 
 module.exports = InputHandler;

@@ -38,9 +38,10 @@ User.prototype.setName = function (user_name) {
  * @param path
  */
 User.prototype.loadSocket = function (path) {
-    var socket = io(path);
+    var socket, deferred;
+    socket = io(path);
+    deferred = new Deferred();
 
-    var deferred = new Deferred();
     this.socketConnected = deferred.promise;
 
     socket.on(SOCKETEVENTS.CONNECT, function () {
@@ -61,8 +62,8 @@ User.prototype.loadSocket = function (path) {
  * Initializes the listeners on the queue-buttons
  */
 User.prototype.setupListeners = function () {
-    this.btnStartQueue.onclick = this._joinQueueFunc.bind(this);
-    this.btnEndQueue.onclick = this._leaveQueueFunc.bind(this);
+    this.btnStartQueue.onclick = this.joinQueueFunc.bind(this);
+    this.btnEndQueue.onclick = this.leaveQueueFunc.bind(this);
     this.btnEndQueue.disabled = true;
 };
 
@@ -86,7 +87,7 @@ User.prototype.startSessionFunc = function (data) {
  * This emits a "join_matchmaking" to the server and responds with the found match
  * @private
  */
-User.prototype._joinQueueFunc = function () {
+User.prototype.joinQueueFunc = function () {
     if (!!this.inQueue) {
         console.log("Already in queue, can't join again it!");
         return;
@@ -115,7 +116,7 @@ User.prototype._joinQueueFunc = function () {
  * This removes the user from the server by sending "leave_matchmaking"
  * @private
  */
-User.prototype._leaveQueueFunc = function () {
+User.prototype.leaveQueueFunc = function () {
     if (!this.inQueue) {
         console.log("Not in queue, can't leave it!");
         return;
@@ -132,8 +133,8 @@ User.prototype._leaveQueueFunc = function () {
 };
 
 //-------------DEBUG HELPERS-------------------
-User.prototype.printSocket = function(){
-    this.socketConnected.then(function(socket){
+User.prototype.printSocket = function () {
+    this.socketConnected.then(function (socket) {
         console.log("socket:", socket);
     });
 };

@@ -46,10 +46,14 @@ Player.prototype.removeRessources = function (res) {
  *
  * @returns {{name: *, ressources: *}}
  */
-Player.prototype.toJSON = function(){
+Player.prototype.toJSON = function () {
+    //var objects = this.objects.map(function (obj) {
+    //    return obj.toJSON();
+    //});
     return {
         name: this.name,
         ressources: this.ressources
+        //objects: objects
     };
 };
 

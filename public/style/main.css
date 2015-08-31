@@ -9,6 +9,10 @@ div#textcontainer {
     background-color: grey;
 }
 
+div#ui_container {
+    visibility: hidden
+}
+
 canvas {
     width: 600px;
     height: 500px;
