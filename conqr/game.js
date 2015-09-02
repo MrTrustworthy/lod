@@ -52,7 +52,7 @@ Game.prototype.getPlayer = function (name) {
 /**
  *
  * @param playerName
- * @param where
+ * @param where something like {x: 2, y: 2}
  */
 Game.prototype.build = function (playerName, where) {
     var obj, field, player;

@@ -31,6 +31,7 @@ var User = function () {
  */
 User.prototype.setName = function (user_name) {
     this.name = user_name;
+    this.game = null;
 };
 
 /**
@@ -77,8 +78,11 @@ User.prototype.startSessionFunc = function (data) {
     this.btnEndQueue.disabled = true;
     this.btnStartQueue.disabled = true;
 
-    this.game = new Game();
-    this.socketConnected.then(this.game.start.bind(this.game));
+
+    this.socketConnected.then(function(socket){
+        this.game = new Game(socket);
+        this.game.start();
+    }.bind(this));
 
 };
 

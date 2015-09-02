@@ -1,6 +1,7 @@
 var THREE = require("./libs/three");
 var Evented = require("./mt-event");
-var SOCKETEVENTS = require("../socketevents");
+
+var VISUTIL = require("./visutil");
 
 /**
  *
@@ -32,32 +33,7 @@ var Visuals = function () {
  */
 Visuals.prototype.loadClickHandler = function () {
 
-    var canvasMouseDown = function (event) {
-
-        var ray, intersections, coords, canvasX, canvasY;
-
-        event.preventDefault();
-
-        // need to adjust the X/Y coords of the click to account for canvas position/offset
-        canvasX = event.clientX - event.target.offsetLeft;
-        canvasY = event.clientY - event.target.offsetTop;
-
-        coords = new THREE.Vector2();
-        coords.x = (canvasX / this.renderer.domElement.width) * 2 - 1;
-        coords.y = -(canvasY / this.renderer.domElement.height) * 2 + 1;
-
-        ray = new THREE.Raycaster();
-        ray.setFromCamera(coords, this.camera);
-
-        intersections = ray.intersectObjects(this.scene.children);
-
-        if (intersections.length === 0) {
-            return;
-        }
-
-        this.emit(SOCKETEVENTS.CLIENT.CLICKED_ON_OBJECT, intersections);
-
-    };
+    var canvasMouseDown = VISUTIL.canvasMouseDownHandler.bind(this);
 
     this.canvas.addEventListener('mousedown', canvasMouseDown.bind(this), false);
 };
@@ -68,32 +44,9 @@ Visuals.prototype.loadClickHandler = function () {
  * @param viewData
  */
 Visuals.prototype.initView = function (viewData) {
+    var scene = this.scene;
 
-    var resColors, createObject, stringToColor;
-
-    console.log("#Visualmanager: trying to initialize view with data", viewData);
-
-    // Step 0: Prepare utilities for view
-    resColors = {
-        default: 0x444444,
-        Off: 0xff0000,
-        Def: 0x0000ff,
-        Build: 0x00ff00
-    };
-
-    stringToColor = function (str) { // java String#stringToColor
-        var hash, i, c;
-
-        hash = 0;
-        for (i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        c = (hash & 0x00FFFFFF)
-            .toString(16)
-            .toUpperCase();
-        return "00000".substring(0, 6 - c.length) + c;
-    };
-
+    console.log("#Visualmanager: initializing view with data", viewData);
 
     // Step 1: Set up camera position and view
     this.camera.position.x = 50;
@@ -102,62 +55,16 @@ Visuals.prototype.initView = function (viewData) {
     this.camera.lookAt(new THREE.Vector3(50, 50, 0));
 
 
-    // Step 2: Prepare creation of worldobjects
-    createObject = function (field) {
-
-        var object, geometry, material, sphere;
-
-        object = field.object;
-        if (!object) {
-            return;
-        }
-
-
-        geometry = new THREE.SphereGeometry(2);
-        material = new THREE.MeshBasicMaterial({
-            color: stringToColor(object.owner.name)
-        });
-        sphere = new THREE.Mesh(geometry, material);
-
-        //sphere.position.x = field.position.x * 5;
-        //sphere.position.y = field.position.y * 5;
-        //sphere.position.z = 5;
-        sphere.userData = field;
-
-        return sphere;
-
-
-    };
-
-
     // Step 2: Set up fields
     viewData.map.forEach(function (field) {
-        var geometry, material, plane, color, object;
-
-        color = !field.ressource ? resColors.default : resColors[field.ressource.name];
-
-        geometry = new THREE.PlaneGeometry(5, 5);
-
-        material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
-        plane = new THREE.Mesh(geometry, material);
-
-        plane.position.x = field.position.x * 5;
-        plane.position.y = field.position.y * 5;
-        plane.position.z = 0;
-        plane.userData = field;
-
-        object = createObject(field);
-        if (object) {
+        var plane, object;
+        plane = VISUTIL.createPlaneForField(field);
+        if (field.object) {
+            object = VISUTIL.createObjectForField(field.object);
             plane.add(object);
         }
-
-        this.scene.add(plane);
-
-    }.bind(this));
-
-
-    // Step 3: Set up buildings
-
+        scene.add(plane);
+    });
 
 };
 
@@ -166,9 +73,56 @@ Visuals.prototype.initView = function (viewData) {
  * @param viewData
  */
 Visuals.prototype.updateView = function (viewData) {
+
+    var currentFields, updatedFields;
     console.log("#Visualmanager updating views with", viewData);
+
+    currentFields = this.scene.children;
+    updatedFields = viewData.map;
+
+    // we can assume that the viewdata and the scenes children are in the same order
+    currentFields.forEach(function (currentField, i) {
+
+        this.updateField(currentField, updatedFields[i]);
+    }.bind(this));
+
+
 };
 
+Visuals.prototype.updateField = function (currentField, newFieldData) {
+
+    // DEBUG check for errors with this approach
+    if (currentField.userData.position.x !== newFieldData.position.x &&
+        currentField.userData.position.y !== newFieldData.position.y) {
+        throw new Error("Field update order doesn't match!");
+    }
+    if (!VISUTIL.hasChanged(currentField.userData, newFieldData)) {
+        console.log("Nothing changed!");
+        return;
+    }
+
+    // Update object on field
+
+    this.updateObject(currentField, newFieldData);
+
+
+};
+
+Visuals.prototype.updateObject = function (currentField, newFieldData) {
+    if (!VISUTIL.hasChanged(currentField.userData.object, newFieldData.object)) {
+        console.log("Object has not changed!");
+        return;
+    }
+
+    // remove current object if exists
+    if (currentField.children.length === 1) {
+        currentField.remove(currentField.children[0]);
+    }
+
+    var newObject = VISUTIL.createObjectForField(newFieldData.object);
+    currentField.add(newObject);
+
+};
 
 /**
  * Starts the rendering of the scene
