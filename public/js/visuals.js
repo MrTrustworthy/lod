@@ -1,6 +1,5 @@
 var THREE = require("./libs/three");
 var Evented = require("./mt-event");
-
 var VISUTIL = require("./visutil");
 
 /**
@@ -33,9 +32,8 @@ var Visuals = function () {
  */
 Visuals.prototype.loadClickHandler = function () {
 
-    var canvasMouseDown = VISUTIL.canvasMouseDownHandler.bind(this);
-
-    this.canvas.addEventListener('mousedown', canvasMouseDown.bind(this), false);
+    this.canvas.addEventListener('mousedown', VISUTIL.canvasMouseDownHandler.bind(this), false);
+    this.canvas.addEventListener("contextmenu", VISUTIL.canvasRightClickHandler.bind(this), false);
 };
 
 
@@ -101,9 +99,11 @@ Visuals.prototype.updateField = function (currentField, newFieldData) {
         return;
     }
 
-    // Update object on field
-
+    // Update object on field & data of the field
     this.updateObject(currentField, newFieldData);
+    currentField.userData = newFieldData;
+
+    //TODO update field data like ressources
 
 
 };

@@ -30,14 +30,17 @@ var socketevents =  {
         NEW_INPUT: "new_input"
     },
     CLIENT: {
-        CLICKED_END_TURN: "end_turn",
+        //CLICKED_END_TURN: "end_turn",
         CLICKED_ON_OBJECT: "clicked_on_object",
         SELECTION_CHANGED: "selection_changed",
-        CLICKED_ON_ACTION: "clicked_on_action"
+        CLICKED_ON_ACTION: "clicked_on_action",
+        CLICKED_RIGHT: "clicked_right"
     },
     COMMAND: {
         END_TURN: "end_turn",
-        BUILD: "build"
+        BUILD: "build",
+        ATTACK: "attack",
+        IMPROVE: "improve"
     }
 
 };

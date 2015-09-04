@@ -13,6 +13,25 @@ div#ui_container {
     visibility: hidden
 }
 
+div#action_pane {
+    visibility: hidden
+}
+
+/*
+.action_pane_button {
+    visibility: hidden
+}*/
+
+.ui_table_td {
+    width: 100px;
+    align-content: center;
+}
+
+#action_pane_selected {
+    width: 300px;
+    align-content: center;
+}
+
 canvas {
     width: 600px;
     height: 500px;

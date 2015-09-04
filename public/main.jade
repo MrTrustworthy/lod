@@ -28,11 +28,26 @@ html
                     th End Turn
                 tbody
                     tr
-                        td(id="ui_table_name") NIX
-                        td(id="ui_table_build") NIX
-                        td(id="ui_table_def") NIX
-                        td(id="ui_table_off") NIX
-                        td(id="ui_table_turn") NIX
-                        td(id="ui_table_end_turn")
+                        td(id="ui_table_name" class="ui_table_td") NIX
+                        td(id="ui_table_build" class="ui_table_td") NIX
+                        td(id="ui_table_def" class="ui_table_td") NIX
+                        td(id="ui_table_off" class="ui_table_td") NIX
+                        td(id="ui_table_turn" class="ui_table_td") NIX
+                        td(id="ui_table_end_turn" class="ui_table_td")
+                            button(id="ui_table_end_turn_button") End turn
 
         canvas(id="main_canvas" width="600" height="400")
+
+        div(id="action_pane")
+            table
+                thead
+                    th Selected
+                    th Actions
+
+                tbody
+                    tr
+                        td(id="action_pane_selected")
+                        td(id="action_pane_actions")
+                            button(id="action_pane_build_button" class="action_pane_button") Build
+                            button(id="action_pane_improve_button" class="action_pane_button") Improve
+                            button(id="action_pane_attack_button" class="action_pane_button") Attack

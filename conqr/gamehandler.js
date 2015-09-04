@@ -8,6 +8,7 @@ var handlerFunctions = {
     },
     build: function (player, params) {
         //console.log("calling function with params:", arguments);
+        // params are like {x: 5, y: 10}
         this.game.build(player, params);
     }
 };

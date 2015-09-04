@@ -81,6 +81,11 @@ var Visutil = {
 
         event.preventDefault();
 
+        if (event.which === 3) {
+            this.emit(SOCKETEVENTS.CLIENT.CLICKED_RIGHT, null);
+            return;
+        }
+
         // need to adjust the X/Y coords of the click to account for canvas position/offset
         canvasX = event.clientX - event.target.offsetLeft;
         canvasY = event.clientY - event.target.offsetTop;
@@ -97,9 +102,11 @@ var Visutil = {
         if (intersections.length === 0) {
             return;
         }
-
         this.emit(SOCKETEVENTS.CLIENT.CLICKED_ON_OBJECT, intersections);
 
+    },
+    canvasRightClickHandler: function (evt) {
+        evt.preventDefault();
     }
 
 };
