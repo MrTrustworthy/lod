@@ -17,6 +17,13 @@ div#action_pane {
     visibility: hidden
 }
 
+div#message_container {
+    visibility: hidden;
+    width: 600px;
+    height: 200px;
+    overflow: scroll;
+}
+
 /*
 .action_pane_button {
     visibility: hidden

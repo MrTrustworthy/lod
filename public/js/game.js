@@ -24,9 +24,7 @@ var Game = function (socket) {
     socket.on(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, this.visuals.updateView.bind(this.visuals));
     socket.on(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, this.ui.updateInfoPane.bind(this.ui));
 
-    socket.on(SOCKETEVENTS.MESSAGE, function (message) {
-        console.info("MESSAGE FROM SERVER:", message);
-    });
+    socket.on(SOCKETEVENTS.MESSAGE, this.ui.updateMessagePane.bind(this.ui));
 
     this.visuals.on(SOCKETEVENTS.CLIENT.CLICKED_ON_OBJECT, this.inputManager.handleClick.bind(this.inputManager));
     this.visuals.on(SOCKETEVENTS.CLIENT.CLICKED_RIGHT, this.inputManager.clearSelection.bind(this.inputManager));

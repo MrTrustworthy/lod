@@ -1,5 +1,10 @@
 var Field = require("./field");
 
+/**
+ *
+ * @param size
+ * @constructor
+ */
 var WorldMap = function (size) {
 
     this.size = size || {x: 10, y: 10};
@@ -12,6 +17,10 @@ var WorldMap = function (size) {
 };
 
 
+/**
+ *
+ * @returns {Array}
+ */
 WorldMap.prototype.initMap = function () {
     var x,
         y,
@@ -26,6 +35,12 @@ WorldMap.prototype.initMap = function () {
     return map;
 };
 
+/**
+ *
+ * @param originField
+ * @param range
+ * @returns {*|Array.<T>}
+ */
 WorldMap.prototype.inRangeOf = function (originField, range) {
     range = range || 1;
 
@@ -37,14 +52,50 @@ WorldMap.prototype.inRangeOf = function (originField, range) {
     });
 };
 
+/**
+ *
+ * @param field1
+ * @param field2
+ * @returns {boolean}
+ */
+WorldMap.prototype.areAdjacent = function(field1, field2){
+    var isAdjacent = this.adjacentTo(field1).filter(function(field){
+        return field.equals(field2);
+    });
+    return isAdjacent.length === 1;
+};
+
+
+/**
+ *
+ * @param originField
+ * @returns {*|Array.<T>}
+ */
+WorldMap.prototype.adjacentTo = function(originField){
+    var center = originField.position;
+
+    return this.filter(function (field) {
+        if (field.equals(originField)) return false;
+        return Math.abs(center.x - field.position.x) <= 1 && Math.abs(center.y - field.position.y) <= 1;
+    });
+
+};
+
+/**
+ *
+ * @param amount
+ * @returns {Array}
+ */
 WorldMap.prototype.getStartingPoints = function (amount) {
     amount = amount || 2;
 
     var coords = [];
 
     coords.push({
-        x: Math.floor(this.size.x / 2),
-        y: Math.floor(this.size.y / 4)
+        x: 5,
+        y: 5
+        //x: Math.floor(this.size.x / 2),
+        //y: Math.floor(this.size.y / 4)
     });
 
     if (amount === 1) {
@@ -52,8 +103,10 @@ WorldMap.prototype.getStartingPoints = function (amount) {
     }
 
     coords.push({
-        x: Math.floor(this.size.x / 2),
-        y: Math.floor(this.size.y / 1.5)
+        x: 5,
+        y: 7
+        //x: Math.floor(this.size.x / 2),
+        //y: Math.floor(this.size.y / 1.5)
     });
     return coords;
 };
@@ -62,10 +115,20 @@ WorldMap.prototype.getStartingPoints = function (amount) {
 /*##############################################################*/
 
 
+/**
+ *
+ * @param x
+ * @param y
+ * @returns {*}
+ */
 WorldMap.prototype.get = function (x, y) {
     return this.fields[x][y];
 };
 
+/**
+ *
+ * @param callback
+ */
 WorldMap.prototype.forEach = function (callback) {
     var x, y, row;
     for (x = 0; x < this.fields.length; x++) {
@@ -76,6 +139,11 @@ WorldMap.prototype.forEach = function (callback) {
     }
 };
 
+/**
+ *
+ * @param callback
+ * @returns {Array}
+ */
 WorldMap.prototype.filter = function (callback) {
     var flds = [];
     this.forEach(function (field) {
@@ -86,6 +154,10 @@ WorldMap.prototype.filter = function (callback) {
     return flds;
 };
 
+/**
+ *
+ * @returns {Array}
+ */
 WorldMap.prototype.toJSON = function () {
     var json = [];
     this.forEach(function (fld) {
@@ -95,6 +167,10 @@ WorldMap.prototype.toJSON = function () {
 };
 
 
+/**
+ *
+ * @returns {Array}
+ */
 WorldMap.prototype.toString = function () {
     var output = [],
         currRow = 0;

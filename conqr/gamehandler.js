@@ -1,19 +1,6 @@
 var Game = require("./game");
-var logger = require("../utils/mt-log")("main-log");
-
-
-var handlerFunctions = {
-    end_turn: function () {
-        this.game.players.push(this.game.players.shift());
-    },
-    build: function (player, params) {
-        //console.log("calling function with params:", arguments);
-        // params are like {x: 5, y: 10}
-        this.game.build(player, params);
-    }
-};
-
-
+//var logger = require("../utils/mt-log")("main-log");
+var CommandError = require("../utils/commanderror");
 
 /**
  *
@@ -22,6 +9,13 @@ var handlerFunctions = {
  */
 var GameHandler = function (gameConfig) {
     this.game = new Game(gameConfig);
+
+    this.handlerFunctions = {
+        end_turn: this.game.endTurn.bind(this.game),
+        build: this.game.build.bind(this.game),
+        attack: this.game.attack.bind(this.game)
+    };
+
 };
 
 /**
@@ -36,16 +30,10 @@ GameHandler.prototype.handleCommand = function (player, command, params) {
 
     console.log("#GameHandler: handling command", command, "for player", player, "with args", params);
     if (!this.isTurnOf(player)) {
-        console.log("Player", player, "is not on turn now!");
-        return false;
+        throw new CommandError("Player", player, "is not on turn now!");
     }
-    try {
-        handlerFunctions[command].call(this, player, params);
-        return true;
-    } catch (e) {
-        console.log("#Gamehandler: Sending a command went wrong and caused an error:", e.toString());
-        return false;
-    }
+
+    this.handlerFunctions[command].call(this, player, params);
 
 };
 
@@ -61,7 +49,7 @@ GameHandler.prototype.isTurnOf = function (playerName) {
 
 /**
  *
- * @returns {{map: (string|*|Object|String|{position, object, ressource}|{name, ressources}), players: (Array|*), turnOf: *}|*}
+ * @returns
  */
 GameHandler.prototype.getInitView = function () {
     var map, players, turnOf, json;
@@ -78,7 +66,6 @@ GameHandler.prototype.getInitView = function () {
         players: players,
         turnOf: turnOf
     };
-    //console.log("#Gamehandler: view looks like this", json);
     return json;
 };
 
@@ -89,8 +76,6 @@ GameHandler.prototype.getInitView = function () {
 GameHandler.prototype.getViewUpdate = function () {
     return this.getInitView();
 };
-
-
 
 
 module.exports = GameHandler;

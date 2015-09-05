@@ -14,6 +14,8 @@ Ressource.prototype.toString = function () {
 };
 
 
+/* --------------------------------------------------------------- */
+
 var RessourceGenerator = function () {
     this.RES = {
         BUILD: "Build",

@@ -4,22 +4,44 @@ var SOCKETEVENTS = require("../socketevents");
 var UI = function () {
 
     EventHandler.makeEvented(this);
-
-
     document.getElementById("queue_container").style.visibility = "hidden";
-
-    //this.selected = null; can use data from inputhandler???
 
     this.playerName = window.user.name;
 
     this.infoPane = {};
     this.actionPane = {};
+    this.messagePane = {};
 
-
+    this._loadMessagePane();
     this._loadInfoPane();
     this._loadActionPane();
 
 };
+
+
+/**
+ * Initializes the info-pane on the top
+ * @private
+ */
+UI.prototype._loadMessagePane = function () {
+    this.messagePane.container = document.getElementById("message_container");
+    this.messagePane.container.style.visibility = "visible";
+};
+
+/**
+ *
+ * @param message
+ */
+UI.prototype.updateMessagePane = function (message) {
+    var info,
+     div = document.createElement("div");
+
+    info = message.info ? message.info : JSON.stringify(message);
+    div.innerHTML = info;
+    this.messagePane.container.appendChild(div);
+};
+
+
 
 /**
  * Initializes the info-pane on the top
@@ -65,7 +87,7 @@ UI.prototype.updateInfoPane = function (viewData) {
 
 
 /**
- * TODO
+ *
  * @private
  */
 UI.prototype._loadActionPane = function () {
@@ -105,25 +127,6 @@ UI.prototype._loadActionPane = function () {
 
 };
 
-/**
- * conf is like:
- * {
- *      "build": true,
- *      "attack": false,
- *      "improve": true
- * }
- * @param conf
- */
-UI.prototype.setButtonsVisible = function (conf) {
-
-    var btn;
-    Object.keys(conf).forEach(function (buttonName) {
-        btn = this.actionPane[buttonName + "Btn"];
-        if (conf[buttonName]) btn.show();
-        else btn.hide();
-    }.bind(this));
-
-};
 
 /**
  *
@@ -155,13 +158,13 @@ UI.prototype.updateActionPane = function (selection) {
             this.setButtonsVisible({
                 build: false,
                 improve: true,
-                attack: false
+                attack: true
             });
         } else {
             this.setButtonsVisible({
                 build: false,
                 improve: false,
-                attack: true
+                attack: false
             });
         }
 
@@ -173,7 +176,7 @@ UI.prototype.updateActionPane = function (selection) {
         pos = selection.position;
         selectedInfo = "Field on " + pos.x + ":" + pos.y;
         if (selection.ressource) {
-            selectedInfo += " with " + selection.ressource.name;
+            selectedInfo += " with " + selection.ressource.amount + " " + selection.ressource.name;
         }
         this.setButtonsVisible({
             build: true,
@@ -188,6 +191,28 @@ UI.prototype.updateActionPane = function (selection) {
 
 };
 
+
+/* ---------------------------- UTILS ----------------------------*/
+
+/**
+ * conf is like:
+ * {
+ *      "build": true,
+ *      "attack": false,
+ *      "improve": true
+ * }
+ * @param conf
+ */
+UI.prototype.setButtonsVisible = function (conf) {
+
+    var btn;
+    Object.keys(conf).forEach(function (buttonName) {
+        btn = this.actionPane[buttonName + "Btn"];
+        if (conf[buttonName]) btn.show();
+        else btn.hide();
+    }.bind(this));
+
+};
 
 // Utility functions to manipulate the dom
 UI.prototype.show = function (obj) {

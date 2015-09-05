@@ -38,10 +38,29 @@ InputManager.prototype.handleClick = function (object) {
         return;
     }
 
+
     console.info("#Inputmanager: clicked on:", field);
 
+
+    // attack if we are in attack mode
     if (this.isInAttackMode) {
-        console.warn("#Inputmanager: IN ATTACK MODE, ATTACKING:", field);
+
+        console.warn("#Inputmanager: IN ATTACK MODE, ATTACKING:", field, "from", this.selected);
+
+        // send attack command
+        this.socket.emit(
+            SOCKETEVENTS.ACTIVITY.NEW_INPUT, {
+                command: SOCKETEVENTS.COMMAND.ATTACK,
+                params: {
+                    origin: this.selected.position,
+                    target: field.position
+                }
+            }
+
+        );
+        // clear UI
+        this.isInAttackMode = false;
+        this.select(null);
         return;
     }
 
@@ -67,37 +86,39 @@ InputManager.prototype.handleUICommand = function (input) {
     console.log("#Inputmanager: wants to send command with:", input);
     //debugger;
 
-    var buildCommandObject = function (command) {
+    if (input === SOCKETEVENTS.COMMAND.ATTACK) {
+        this.isInAttackMode = true;
+        return;
+    }
 
-        if (command === SOCKETEVENTS.COMMAND.BUILD) {
+    var getCommand = function (input) {
+
+        if (input === SOCKETEVENTS.COMMAND.BUILD) {
             return {
-                command: command,
+                command: input,
                 params: this.selected.position
             };
         }
-        if (command === SOCKETEVENTS.COMMAND.END_TURN) {
+        if (input === SOCKETEVENTS.COMMAND.END_TURN) {
             return {
-                command: command,
+                command: input,
                 params: {}
             };
         }
-        if (command === SOCKETEVENTS.COMMAND.IMPROVE) {
+        if (input === SOCKETEVENTS.COMMAND.IMPROVE) {
             return {
-                command: command,
+                command: input,
                 params: this.selected.position
             };
         }
-        if (command === SOCKETEVENTS.COMMAND.ATTACK) {
-            this.isInAttackMode = true;
-            return;
-        }
+
 
         throw new Error("No Command Matched for input!", input);
 
     };
 
 
-    this.socket.emit(SOCKETEVENTS.ACTIVITY.NEW_INPUT, buildCommandObject.call(this, input));
+    this.socket.emit(SOCKETEVENTS.ACTIVITY.NEW_INPUT, getCommand.call(this, input));
 
 };
 

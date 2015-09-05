@@ -6,17 +6,6 @@ var Visutil = {
 
     hasChanged: function (currData, newData) {
         return !(JSON.stringify(newData) === JSON.stringify(currData));
-        //var key, i, l,
-        //    keys = Object.keys(currData);
-        //
-        //for (i = 0, l = keys.length; i < l; i++) {
-        //    key = keys[i];
-        //    if (currData[key] !== newData[key]) {
-        //        return true;
-        //    }
-        //}
-        //return false;
-
     },
 
     getFieldWithObj: function () {
@@ -50,8 +39,8 @@ var Visutil = {
         return sphere;
     },
 
-    createPlaneForField: function (field) {
-        var geometry, material, plane, color, fieldColors;
+    createTextureForField: function (field) {
+        var fieldColors, color, material;
 
         fieldColors = {
             default: 0x444444,
@@ -61,10 +50,19 @@ var Visutil = {
         };
 
         color = !field.ressource ? fieldColors.default : fieldColors[field.ressource.name];
+        material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+
+        return material;
+    },
+
+    createPlaneForField: function (field) {
+        var geometry, material, plane;
+
+        material = Visutil.createTextureForField(field);
 
         geometry = new THREE.PlaneGeometry(5, 5);
 
-        material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+
         plane = new THREE.Mesh(geometry, material);
 
         plane.position.x = field.position.x * 5;

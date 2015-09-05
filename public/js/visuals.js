@@ -89,21 +89,34 @@ Visuals.prototype.updateView = function (viewData) {
 
 Visuals.prototype.updateField = function (currentField, newFieldData) {
 
+    var newMaterial;
+
     // DEBUG check for errors with this approach
     if (currentField.userData.position.x !== newFieldData.position.x &&
         currentField.userData.position.y !== newFieldData.position.y) {
         throw new Error("Field update order doesn't match!");
     }
+    // GUARD STATEMENT
     if (!VISUTIL.hasChanged(currentField.userData, newFieldData)) {
         console.log("Nothing changed!");
         return;
     }
 
-    // Update object on field & data of the field
+
+    // Update Ressources
+    if (VISUTIL.hasChanged(currentField.userData.ressource, newFieldData.ressource)) {
+        //debugger;
+        newMaterial = VISUTIL.createTextureForField(newFieldData);
+        currentField.material = newMaterial;
+        currentField.material.needsUpdate = true;
+    }
+
+    // Update object on field
     this.updateObject(currentField, newFieldData);
+
+    // when we're done, we set the current user data to the new data
     currentField.userData = newFieldData;
 
-    //TODO update field data like ressources
 
 
 };
@@ -118,6 +131,9 @@ Visuals.prototype.updateObject = function (currentField, newFieldData) {
     if (currentField.children.length === 1) {
         currentField.remove(currentField.children[0]);
     }
+
+    // stop right here if the object is gone
+    if(!newFieldData.object) return;
 
     var newObject = VISUTIL.createObjectForField(newFieldData.object);
     currentField.add(newObject);

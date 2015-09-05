@@ -2,12 +2,13 @@ var logger = require("../utils/mt-log")("main-log");
 var SOCKETEVENTS = require("../shared/socketevents");
 //var Activity = require("../activities/activity");
 var GameHandler = require("../conqr/gamehandler");
+var CommandError = require("../utils/commanderror");
 
 var Session = function Session(clients) {
     var clientNames, gameConf;
 
     this.clients = clients instanceof Array ? clients : [clients];
-    clientNames = this.loadClients(clients);
+    clientNames = this.loadClients();
 
     // create Game instance
     gameConf = {
@@ -76,14 +77,23 @@ Session.prototype.loadClients = function () {
  */
 Session.prototype.handleClientInput = function (clientName, clientInput) {
 
-    logger.log("#Session: Sending updated input for", clientName, ":", clientInput.toString());
+    logger.log("#Session: Sending updated input for", clientName, ":", clientInput);
 
-    var hasHandled = this.gameHandler.handleCommand(clientName, clientInput.command, clientInput.params);
+    try {
+        this.gameHandler.handleCommand(clientName, clientInput.command, clientInput.params);
 
-    if (!hasHandled) {
+    } catch (e) {
+        if (e instanceof CommandError) {
+            console.error("#Session: Error when handling", clientInput, "for", clientName, ", handling it!");
+            this.clients.forEach(function (client) {
+                client.socket.emit(SOCKETEVENTS.MESSAGE, {type: "error", info: e.message});
+            }.bind(this));
+        } else {
+            console.error("#Session: CRITICAL! NOT RECOGNIZED ERROR! THIS SHOULD NOT HAPPEN!");
+            throw e;
+        }
         return;
     }
-
     logger.log("#Session: Updating clients with new view", Object.keys(this.clients));
 
     this.clients.forEach(function (client) {
