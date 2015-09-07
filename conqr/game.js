@@ -82,13 +82,17 @@ Game.prototype.attack = function (player, args) {
         throw new CommandError("Can't attack own objects!");
     } else if (originObj.attack === 0) { //#5: Player tries to attack with a street -.-
         throw new CommandError("Can't with an object that has no attack value!");
+    } else if(originObj.hasAttacked){ //#6: Player already has attacked with the object this round
+        throw new CommandError("Can't attack twice a round with the same object");
     }
 
-    console.log("#Game: trying to attack:");
-    console.log(player, "->", args);
+    //console.log("#Game: trying to attack:");
+    //console.log(originObj.toString(), "->", targetObj.toString());
 
     targetObj.hit(originObj.attack);
-    originObj.hit(targetField.attack);
+    originObj.hasAttacked = true;
+
+    originObj.hit(targetObj.attack);
 };
 
 
@@ -97,10 +101,20 @@ Game.prototype.attack = function (player, args) {
  * @param playerName
  * @param where something like {x: 2, y: 2}
  */
-Game.prototype.build = function (playerName, where) {
-    var obj, field, player;
+Game.prototype.build = function (playerName, params) {
+    var obj, field, player, where, type, typeObj;
 
-    field = this.map.get(where.x, where.y);
+    console.log("#Game: calling 'build' with the parameters:", params);
+
+    try {
+        where = params.position;
+        type = params.type;
+        // is already errorchecked
+        field = this.map.get(where.x, where.y);
+    }catch(e){
+        if(e instanceof CommandError) throw e;
+        throw new CommandError("The passed command contains invalid parameters");
+    }
 
     // check if field exists
     if (!field) {
@@ -122,8 +136,12 @@ Game.prototype.build = function (playerName, where) {
     player = this.getPlayer(playerName);
     player.removeRessources({name: RG.RES.BUILD, value: 1});
 
+    // check if we have this kind of object
+    typeObj = WorldObject.TYPES[type.toUpperCase()];
+    if(!typeObj) throw new CommandError("Object with Type", type, "does not exist!");
+
     // no errors so far? fine, i guess we'll build it then
-    obj = new WorldObject(WorldObject.TYPES.STREET);
+    obj = new WorldObject(typeObj);
     player.addObject(obj);
     field.placeObject(obj);
 };
@@ -137,6 +155,8 @@ Game.prototype.endTurn = function () {
         currPlayer = this.players.shift();
 
     currPlayer.objects.forEach(function (obj) {
+        // reset the objects "hasAttacked" state
+        obj.hasAttacked = false;
         // withdraw ressource from field
         res = obj.field.fetchRessource();
         // add it to the players pool

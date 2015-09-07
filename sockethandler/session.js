@@ -77,7 +77,7 @@ Session.prototype.loadClients = function () {
  */
 Session.prototype.handleClientInput = function (clientName, clientInput) {
 
-    logger.log("#Session: Sending updated input for", clientName, ":", clientInput);
+    console.log("#Session: Sending updated input for", clientName, ":", clientInput);
 
     try {
         this.gameHandler.handleCommand(clientName, clientInput.command, clientInput.params);

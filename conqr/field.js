@@ -20,10 +20,8 @@ var Field = function (position) {
  * @param obj
  */
 Field.prototype.placeObject = function (obj) {
-    if (this.object) {
-        console.error("#Field:CRITICAL: Already have object on", this.toString());
-        throw new Error("#Field: CRITICAL:Already have object on", this.toString());
-    }
+    if (this.object) throw new CommandError("#Field: CRITICAL:Already have object on", this.toString());
+
     this.object = obj;
     obj.field = this;
 };
@@ -47,23 +45,16 @@ Field.prototype.equals = function(other){
 /**
  *
  * @param amount
+ * @returns amount of ressource fetched, or none
  */
 Field.prototype.fetchRessource = function (fetchAmount) {
-    if (!this.ressource) return false;
-
-    var amount, returnValue;
+    if (!this.ressource) return null;
 
     fetchAmount = fetchAmount || 1;
 
-    amount = Math.min(fetchAmount, this.ressource.amount);
-    returnValue = RG.get(this.ressource.name, amount);
-
-    this.ressource.amount -= amount;
+    var ressource = this.ressource.sub(fetchAmount);
     if (this.ressource.amount <= 0) this.ressource = null;
-
-
-    return returnValue;
-
+    return ressource;
 };
 
 /**

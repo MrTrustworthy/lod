@@ -1,4 +1,4 @@
-var WorldObject = require("./worldobject");
+//var WorldObject = require("./worldobject");
 var RG = require("./ressourcegenerator");
 var CommandError = require("../utils/commanderror");
 
@@ -27,7 +27,7 @@ Player.prototype.addObject = function(object){
  * @param object
  */
 Player.prototype.removeObject = function(object){
-    var i = this.objects.indexOf(this);
+    var i = this.objects.indexOf(object);
     if(i === -1) throw new Error("#PLAYER: CRITICAL: player doesn't have this object?!");
     this.objects.splice(i, 1);
 };
@@ -62,7 +62,6 @@ Player.prototype.removeRessources = function (res) {
         this.ressources[ressource.name] -= ressource.value;
     }.bind(this));
 
-    return true;
 };
 
 /**

@@ -86,6 +86,7 @@ InputManager.prototype.handleUICommand = function (input) {
     console.log("#Inputmanager: wants to send command with:", input);
     //debugger;
 
+    // if the command is "attack", just trigger attack mode and be done
     if (input === SOCKETEVENTS.COMMAND.ATTACK) {
         this.isInAttackMode = true;
         return;
@@ -93,10 +94,22 @@ InputManager.prototype.handleUICommand = function (input) {
 
     var getCommand = function (input) {
 
-        if (input === SOCKETEVENTS.COMMAND.BUILD) {
+        if (input === SOCKETEVENTS.COMMAND.BUILD_STREET) {
             return {
-                command: input,
-                params: this.selected.position
+                command: SOCKETEVENTS.COMMAND.BUILD,
+                params: {
+                    type: SOCKETEVENTS.OBJECTS.STREET,
+                    position: this.selected.position
+                }
+            };
+        }
+        if (input === SOCKETEVENTS.COMMAND.BUILD_TURRET) {
+            return {
+                command: SOCKETEVENTS.COMMAND.BUILD,
+                params: {
+                    type: SOCKETEVENTS.OBJECTS.TURRET,
+                    position: this.selected.position
+                }
             };
         }
         if (input === SOCKETEVENTS.COMMAND.END_TURN) {
@@ -122,15 +135,5 @@ InputManager.prototype.handleUICommand = function (input) {
 
 };
 
-/**
- *
- */
-InputManager.prototype.sendEndTurn = function () {
-    console.log("#InputManager: Sending end turn signal");
-    this.socket.emit(SOCKETEVENTS.ACTIVITY.NEW_INPUT, {
-        command: SOCKETEVENTS.COMMAND.END_TURN,
-        params: {}
-    });
-};
 
 module.exports = InputManager;

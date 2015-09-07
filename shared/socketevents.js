@@ -1,6 +1,4 @@
-/**
- * Created by MrTrustworthy on 04.08.2015.
- */
+
 
 var socketevents =  {
     // those are socket events to emit/listen to
@@ -38,8 +36,14 @@ var socketevents =  {
     COMMAND: {
         END_TURN: "end_turn",
         BUILD: "build",
+        BUILD_STREET: "build_street",
+        BUILD_TURRET: "build_turret",
         ATTACK: "attack",
         IMPROVE: "improve"
+    },
+    OBJECTS: {
+        STREET: "street",
+        TURRET: "turret"
     }
 
 };

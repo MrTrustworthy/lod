@@ -1,4 +1,5 @@
 var Field = require("./field");
+var CommandError = require("../utils/commanderror");
 
 /**
  *
@@ -122,7 +123,15 @@ WorldMap.prototype.getStartingPoints = function (amount) {
  * @returns {*}
  */
 WorldMap.prototype.get = function (x, y) {
-    return this.fields[x][y];
+    try {
+        var fld = this.fields[x][y];
+        if (!fld) throw new CommandError("A field on", x, ":", y, "doesn't exist");
+        else return fld;
+    }catch(e){
+        if(e instanceof CommandError) throw e;
+        else throw new CommandError("A field on", x, ":", y, "doesn't exist");
+    }
+
 };
 
 /**

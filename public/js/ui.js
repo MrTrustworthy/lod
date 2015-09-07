@@ -34,13 +34,12 @@ UI.prototype._loadMessagePane = function () {
  */
 UI.prototype.updateMessagePane = function (message) {
     var info,
-     div = document.createElement("div");
+        div = document.createElement("div");
 
     info = message.info ? message.info : JSON.stringify(message);
     div.innerHTML = info;
     this.messagePane.container.appendChild(div);
 };
-
 
 
 /**
@@ -102,11 +101,6 @@ UI.prototype._loadActionPane = function () {
     this.actionPane.container = document.getElementById("action_pane");
     this.actionPane.selected = document.getElementById("action_pane_selected");
 
-    this.actionPane.buildBtn = document.getElementById("action_pane_build_button");
-    this.actionPane.buildBtn.show = this.show;
-    this.actionPane.buildBtn.hide = this.hide;
-    this.actionPane.buildBtn.onclick = getActionFunc(SOCKETEVENTS.COMMAND.BUILD);
-
     this.actionPane.improveBtn = document.getElementById("action_pane_improve_button");
     this.actionPane.improveBtn.show = this.show;
     this.actionPane.improveBtn.hide = this.hide;
@@ -117,6 +111,39 @@ UI.prototype._loadActionPane = function () {
     this.actionPane.attackBtn.show = this.show;
     this.actionPane.attackBtn.hide = this.hide;
     this.actionPane.attackBtn.onclick = getActionFunc(SOCKETEVENTS.COMMAND.ATTACK);
+
+
+    // ------------------------------------------------
+    // ------------- build stuff buttons --------------
+    // ------------------------------------------------
+    this.actionPane.buildBtn = document.getElementById("action_pane_build_button");
+    this.actionPane.buildBtn.show = this.show;
+    this.actionPane.buildBtn.hide = this.hide;
+    //getActionFunc(SOCKETEVENTS.COMMAND.BUILD);
+
+
+    this.actionPane.buildDlg = document.getElementById("action_pane_build_dialog");
+    this.actionPane.buildDlg.isShown = false;
+
+    // toggle dialog
+    this.actionPane.buildBtn.onclick = function () {
+        if (!this.actionPane.buildDlg.isShown) {
+            this.actionPane.buildDlg.show();
+            this.actionPane.buildDlg.isShown = true;
+        }
+        else {
+            this.actionPane.buildDlg.close();
+            this.actionPane.buildDlg.isShown = false;
+        }
+    }.bind(this);
+
+    // the actual build buttons
+    this.actionPane.buildStreetBtn = document.getElementById("action_pane_build_street_button");
+    this.actionPane.buildStreetBtn.onclick = getActionFunc(SOCKETEVENTS.COMMAND.BUILD_STREET);
+
+
+    this.actionPane.buildTurretBtn = document.getElementById("action_pane_build_turret_button");
+    this.actionPane.buildTurretBtn.onclick = getActionFunc(SOCKETEVENTS.COMMAND.BUILD_TURRET);
 
     this.actionPane.container.style.visibility = "visible";
     this.setButtonsVisible({
@@ -139,7 +166,7 @@ UI.prototype.updateActionPane = function (selection) {
 
     var selectedInfo, obj, pos, ownerName;
 
-    if(!selection){
+    if (!selection) {
 
         selectedInfo = "Nothing";
         this.setButtonsVisible({
@@ -148,7 +175,7 @@ UI.prototype.updateActionPane = function (selection) {
             attack: false
         });
 
-    }else if (selection.object) {
+    } else if (selection.object) {
 
         obj = selection.object;
         ownerName = obj.owner.name;
@@ -185,8 +212,15 @@ UI.prototype.updateActionPane = function (selection) {
         });
 
     }
-    //this.selected = selection; can use data from inputhandler???
+
+    // update selection info
     this.actionPane.selected.innerHTML = selectedInfo;
+
+    // hide dialog, if open
+    if(this.actionPane.buildDlg.isShown) {
+        this.actionPane.buildDlg.close();
+        this.actionPane.buildDlg.isShown = false;
+    }
 
 
 };
