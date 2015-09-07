@@ -5,7 +5,7 @@ var SOCKETEVENTS = require("../socketevents");
 var Visutil = {
 
     hasChanged: function (currData, newData) {
-        return !(JSON.stringify(newData) === JSON.stringify(currData));
+        return JSON.stringify(newData) !== JSON.stringify(currData);
     },
 
     getFieldWithObj: function () {
@@ -44,9 +44,9 @@ var Visutil = {
 
         fieldColors = {
             default: 0x444444,
-            Off: 0xff0000,
-            Def: 0x0000ff,
-            Build: 0x00ff00
+            attack: 0xff0000,
+            shield: 0x0000ff,
+            build: 0x00ff00
         };
 
         color = !field.ressource ? fieldColors.default : fieldColors[field.ressource.name];

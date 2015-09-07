@@ -1,4 +1,4 @@
-var RG = require("./ressourcegenerator");
+var Ressource = require("./ressourcegenerator");
 var CommandError = require("../utils/commanderror");
 /**
  *
@@ -9,7 +9,7 @@ var Field = function (position) {
 
     this.position = position;
 
-    this.ressource = Math.random() > 0.3 ? RG.get() : null;
+    this.ressource = Math.random() > 0.3 ? new Ressource(Ressource.TYPES.RANDOM, 3) : null;
 
     this.object = null;
 

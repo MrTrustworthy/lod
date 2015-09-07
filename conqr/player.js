@@ -1,5 +1,5 @@
 //var WorldObject = require("./worldobject");
-var RG = require("./ressourcegenerator");
+var Ressource = require("./ressourcegenerator");
 var CommandError = require("../utils/commanderror");
 
 /**
@@ -9,7 +9,11 @@ var CommandError = require("../utils/commanderror");
  */
 var Player = function (name) {
     this.name = name || "Default Player";
-    this.ressources = RG.getStartingRessources();
+    this.ressources = {};
+    this.ressources[Ressource.TYPES.BUILD] = new Ressource(Ressource.TYPES.BUILD, 4);
+    this.ressources[Ressource.TYPES.ATTACK] = new Ressource(Ressource.TYPES.ATTACK, 4);
+    this.ressources[Ressource.TYPES.SHIELD] = new Ressource(Ressource.TYPES.SHIELD, 4);
+
     this.objects = [];
 };
 
@@ -17,7 +21,7 @@ var Player = function (name) {
  *
  * @param object
  */
-Player.prototype.addObject = function(object){
+Player.prototype.addObject = function (object) {
     this.objects.push(object);
     object.owner = this;
 };
@@ -26,9 +30,9 @@ Player.prototype.addObject = function(object){
  *
  * @param object
  */
-Player.prototype.removeObject = function(object){
+Player.prototype.removeObject = function (object) {
     var i = this.objects.indexOf(object);
-    if(i === -1) throw new Error("#PLAYER: CRITICAL: player doesn't have this object?!");
+    if (i === -1) throw new Error("#PLAYER: CRITICAL: player doesn't have this object?!");
     this.objects.splice(i, 1);
 };
 
@@ -38,28 +42,31 @@ Player.prototype.removeObject = function(object){
  * @param res
  */
 Player.prototype.addRessource = function (res) {
-    this.ressources[res.name] += res.amount;
+    if(!res) return;
+    this.ressources[res.name].add(res);
 };
 
 /**
  *
  * @param res
- * @returns {boolean}
+ * @returns
  */
 Player.prototype.removeRessources = function (res) {
+    if(!res) return;
 
     res = (res instanceof Array) ? res : [res];
 
     // check if we have enough ressources
     var enough = res.every(function (ressource) {
-        return (this.ressources[ressource.name] - ressource.value) >= 0;
+        return this.ressources[ressource.name].canSub(ressource.amount);
     }.bind(this));
+
     if (!enough) {
         throw new CommandError("Not enough ressources!");
     }
 
     res.forEach(function (ressource) {
-        this.ressources[ressource.name] -= ressource.value;
+        this.ressources[ressource.name].sub(ressource.value);
     }.bind(this));
 
 };

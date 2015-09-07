@@ -1,5 +1,5 @@
 var Evented = require("../shared/js/mt-event");
-var RG = require("./ressourcegenerator");
+var Ressource = require("./ressourcegenerator");
 /**
  *
  * @param type

@@ -1,6 +1,6 @@
 var WorldMap = require("./map");
 var Player = require("./player");
-var RG = require("./ressourcegenerator");
+var Ressource = require("./ressourcegenerator");
 var WorldObject = require("./worldobject");
 var CommandError = require("../utils/commanderror");
 
@@ -134,7 +134,7 @@ Game.prototype.build = function (playerName, params) {
 
     // if everything went fine, try to withdraw ressources
     player = this.getPlayer(playerName);
-    player.removeRessources({name: RG.RES.BUILD, value: 1});
+    player.removeRessources(new Ressource(Ressource.TYPES.BUILD, 1));
 
     // check if we have this kind of object
     typeObj = WorldObject.TYPES[type.toUpperCase()];

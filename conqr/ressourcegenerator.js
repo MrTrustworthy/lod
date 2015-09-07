@@ -11,7 +11,7 @@ Ressource.TYPES = {
     ATTACK: "attack"
 };
 
-Object.defineProperty(Ressource.TYPES, "random", {
+Object.defineProperty(Ressource.TYPES, "RANDOM", {
     set: function(val){
         console.error("#Ressource: Can't set random to", val);
     },
@@ -22,6 +22,10 @@ Object.defineProperty(Ressource.TYPES, "random", {
         else return "build";
     }
 });
+
+Ressource.prototype.canSub = function(amount){
+    return this.amount >= amount;
+};
 
 
 /**
@@ -83,4 +87,4 @@ RessourceGenerator.prototype.getStartingRessources = function () {
 };
 
 
-module.exports = new RessourceGenerator();
+module.exports = Ressource;

@@ -78,9 +78,10 @@ UI.prototype.updateInfoPane = function (viewData) {
         console.error("#UI: Couldn't update the info pane because player data is missing!", viewData);
         return;
     }
-    this.infoPane.build.innerHTML = playerData.ressources.Build;
-    this.infoPane.def.innerHTML = playerData.ressources.Def;
-    this.infoPane.off.innerHTML = playerData.ressources.Off;
+
+    this.infoPane.build.innerHTML = playerData.ressources.build.amount;
+    this.infoPane.def.innerHTML = playerData.ressources.attack.amount;
+    this.infoPane.off.innerHTML = playerData.ressources.shield.amount;
     this.infoPane.turn.innerHTML = viewData.turnOf;
 };
 
