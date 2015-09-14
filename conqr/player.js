@@ -1,5 +1,5 @@
 //var WorldObject = require("./worldobject");
-var Ressource = require("./ressourcegenerator");
+var Ressource = require("./ressource");
 var CommandError = require("../utils/commanderror");
 
 /**
@@ -9,12 +9,19 @@ var CommandError = require("../utils/commanderror");
  */
 var Player = function (name) {
     this.name = name || "Default Player";
+    this.isEliminated = false;
+
+
     this.ressources = {};
     this.ressources[Ressource.TYPES.BUILD] = new Ressource(Ressource.TYPES.BUILD, 4);
     this.ressources[Ressource.TYPES.ATTACK] = new Ressource(Ressource.TYPES.ATTACK, 4);
     this.ressources[Ressource.TYPES.SHIELD] = new Ressource(Ressource.TYPES.SHIELD, 4);
 
     this.objects = [];
+};
+
+Player.prototype.eliminate = function(){
+    this.isEliminated = true;
 };
 
 /**
@@ -76,13 +83,9 @@ Player.prototype.removeRessources = function (res) {
  * @returns {{name: *, ressources: *}}
  */
 Player.prototype.toJSON = function () {
-    //var objects = this.objects.map(function (obj) {
-    //    return obj.toJSON();
-    //});
     return {
         name: this.name,
         ressources: this.ressources
-        //objects: objects
     };
 };
 

@@ -16,6 +16,8 @@ var socketevents =  {
 
     MESSAGE: "message_from_server",
 
+    GAME_ENDED: "game_ended",
+
     MATCHMAKING: {
         LEAVE_MATCHMAKING: "leave_matchmaking",
         MATCH_FOUND: "match_found",
@@ -43,7 +45,8 @@ var socketevents =  {
     },
     OBJECTS: {
         STREET: "street",
-        TURRET: "turret"
+        TURRET: "turret",
+        OBJECT_DESTROYED: "building_destroyed"
     }
 
 };

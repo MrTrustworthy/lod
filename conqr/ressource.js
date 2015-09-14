@@ -58,33 +58,5 @@ Ressource.prototype.toString = function () {
 };
 
 
-/* --------------------------------------------------------------- */
-
-var RessourceGenerator = function () {
-    this.RES = {
-        BUILD: "Build",
-        OFF: "Off",
-        DEF: "Def"
-    };
-};
-
-RessourceGenerator.prototype.randomType = function () {
-    return this.RES[Object.keys(this.RES)[Math.floor(Math.random() * Object.keys(this.RES).length)]];
-};
-
-RessourceGenerator.prototype.get = function (type, amount) {
-    type = type || this.randomType();
-    amount = (amount === undefined) ? Math.ceil(Math.random() * 4) : amount;
-    return new Ressource(type, amount);
-};
-
-RessourceGenerator.prototype.getStartingRessources = function () {
-    return {
-        "Build": 3,
-        "Off": 3,
-        "Def": 3
-    };
-};
-
 
 module.exports = Ressource;

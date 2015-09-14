@@ -1,8 +1,10 @@
 var WorldMap = require("./map");
 var Player = require("./player");
-var Ressource = require("./ressourcegenerator");
+var Ressource = require("./ressource");
 var WorldObject = require("./worldobject");
 var CommandError = require("../utils/commanderror");
+var SOCKETEVENTS = require("../shared/socketevents");
+var EventHandler = require("../shared/js/mt-event");
 
 
 /**
@@ -12,20 +14,19 @@ var CommandError = require("../utils/commanderror");
  */
 var Game = function (config) {
 
+    EventHandler.makeEvented(this);
+
     this.map = new WorldMap(config.worldSize);
 
-    this.players = [];
-
-    config.players.forEach(function (playerName) {
-        this.players.push(new Player(playerName));
-    }.bind(this));
+    this.players = config.players.map(function(playerName){
+        return new Player(playerName);
+    });
 
 
     // Find coordinates for the players bases
     var baseCoords = this.map.getStartingPoints(this.players.length);
-    if (baseCoords.length !== this.players.length) {
-        throw new Error("Mismatch!");
-    }
+    if (baseCoords.length !== this.players.length) throw new Error("Mismatch!");
+
 
     // create the players bases and place them
     this.players.forEach(function (player, i) {
@@ -33,9 +34,33 @@ var Game = function (config) {
         var playerBase = new WorldObject(WorldObject.TYPES.BASE);
         player.addObject(playerBase);
         startingField.placeObject(playerBase);
+        playerBase.on(SOCKETEVENTS.OBJECTS.OBJECT_DESTROYED, this.eliminatePlayer.bind(this));
     }.bind(this));
 
 };
+
+
+/**
+ * Eliminates a player from the game
+ * @param object
+ */
+Game.prototype.eliminatePlayer = function(object){
+    object.owner.eliminate();
+
+    var active = this.players.filter(function(player){
+        return !player.isEliminated;
+    });
+
+    if(active.length <= 1) this.endGame();
+};
+
+/**
+ * Emits end-game-event
+ */
+Game.prototype.endGame = function(){
+    this.emit(SOCKETEVENTS.GAME_ENDED, this);
+};
+
 
 /**
  *
@@ -55,10 +80,52 @@ Game.prototype.getPlayer = function (name) {
 
 /**
  *
- * @param player
- * @param args
+ * @param playerName
+ * @returns {boolean}
  */
-Game.prototype.attack = function (player, args) {
+Game.prototype.isTurnOf = function (playerName) {
+    return this.players[0].name === playerName;
+};
+
+/* ---------------------------------------------------
+--------------------COMMAND FUNCTIONS-----------------
+------------------------------------------------------ */
+
+
+/**
+ *
+ * @param player
+ * @param command
+ * @param params
+ * @returns {boolean}
+ */
+Game.prototype.handleCommand = function (player, command, params) {
+    params = params || {};
+
+    var exposedCommands = {
+        build: this.build,
+        end_turn: this.endTurn,
+        attack: this.attack
+    };
+
+    console.log("#Game: handling command", command, "for player", player, "with args", params);
+    if (!this.isTurnOf(player)) {
+        throw new CommandError("Player", player, "is not on turn now!");
+    } else if (player.isEliminated){
+        throw new CommandError("Player", player, "is already eliminated and can't act!");
+    }
+
+    exposedCommands[command].call(this, player, params);
+
+};
+
+
+/**
+ *
+ * @param player
+ * @param params
+ */
+Game.prototype.attack = function (player, params) {
     var originField,
         originObj,
         targetField,
@@ -67,15 +134,15 @@ Game.prototype.attack = function (player, args) {
 
     // check possible abort cases and create useful error messages
     try { //#1: Fields cant be found
-        originField = this.map.get(args.origin.x, args.origin.y);
+        originField = this.map.get(params.origin.x, params.origin.y);
         originObj = originField.object;
-        targetField = this.map.get(args.target.x, args.target.y);
+        targetField = this.map.get(params.target.x, params.target.y);
         targetObj = targetField.object;
     } catch (e) {
-        throw new CommandError("Couldn't locate one of the fields:", args);
+        throw new CommandError("Couldn't locate one of the fields:", params);
     }
     if (!this.map.areAdjacent(originField, targetField)) { //#2: Fields are not adjacent
-        throw new CommandError("Fields are not adjacent:", args);
+        throw new CommandError("Fields are not adjacent:", params);
     } else if (originObj.owner.name !== player) { //#3: player tries to attack from other players object (cheat?)
         throw new CommandError(player, "can't start attack from object of", originObj.owner.name);
     } else if (originObj.owner.name === targetObj.owner.name) { //#4: Player tries to attack own object or self
@@ -99,7 +166,7 @@ Game.prototype.attack = function (player, args) {
 /**
  *
  * @param playerName
- * @param where something like {x: 2, y: 2}
+ * @param params something like {x: 2, y: 2}
  */
 Game.prototype.build = function (playerName, params) {
     var obj, field, player, where, type, typeObj;
@@ -164,6 +231,41 @@ Game.prototype.endTurn = function () {
     });
     this.players.push(currPlayer);
 };
+
+
+/* ----------------------------------------------------
+ --------------------VIEW HANDLING STUFF---------------
+ ------------------------------------------------------ */
+
+/**
+ *
+ * @returns {{map: (Array|*), players: *, turnOf: *}}
+ */
+Game.prototype.getInitView = function () {
+    var map, players, turnOf;
+
+    map = this.map.toJSON();
+    players = this.players.map(function (player) {
+        return player.toJSON();
+    });
+
+    turnOf = this.players[0].name;
+
+    return {
+        map: map,
+        players: players,
+        turnOf: turnOf
+    };
+};
+
+/**
+ *
+ * @returns {{map, players, turnOf}}
+ */
+Game.prototype.getViewUpdate = function () {
+    return this.getInitView();
+};
+
 
 
 module.exports = Game;

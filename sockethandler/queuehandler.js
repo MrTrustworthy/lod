@@ -15,7 +15,7 @@ var ClientDTO = require("../utils/Objects/clientDTO");
  */
 var QueueHandler = function QueueHandler(popAmount, popInterval) {
 
-    this.popAmount = popAmount || 1;
+    this.popAmount = popAmount || 2;
     this.popInterval = popInterval || 2000;
 
     this.clients = [];
@@ -41,6 +41,7 @@ QueueHandler.prototype.__handlerFunction = function (socket) {
     logger.log("#Queuehandler: Someone connected to the Socket");
 
     // TODO find out how to get the users name from his session
+    // TODO don't just move this down you lazy ass!
     var client = new ClientDTO(null, socket);
 
     socket.on(SOCKETEVENTS.MATCHMAKING.JOIN_MATCHMAKING, function (data) {

@@ -1,7 +1,7 @@
 var logger = require("../utils/mt-log")("main-log");
 var SOCKETEVENTS = require("../shared/socketevents");
 //var Activity = require("../activities/activity");
-var GameHandler = require("../conqr/gamehandler");
+var Game = require("../conqr/game");
 var CommandError = require("../utils/commanderror");
 
 var Session = function Session(clients) {
@@ -18,22 +18,30 @@ var Session = function Session(clients) {
             y: 20
         }
     };
-    this.gameHandler = new GameHandler(gameConf);
+
+    // TODO make the config dynamically/constant/something to avoid having a demo config here
+    this.game = new Game(gameConf);
+
+    // once the game reaches a end-situation, it will emit a corresponding event and the session will handle it
+    this.game.on(SOCKETEVENTS.GAME_ENDED, this.handleGameEnd.bind(this));
 
     // send init view to clients after setting up
     this.clients.forEach(function (client) {
-        client.socket.emit(SOCKETEVENTS.ACTIVITY.INIT_VIEW, this.gameHandler.getInitView());
+        client.socket.emit(SOCKETEVENTS.ACTIVITY.INIT_VIEW, this.game.getInitView());
     }.bind(this));
 };
 
 /**
- * Adds some clients to the session
+ * Adds some clients to the session.
+ * This sets up the clients to communicate commands and disconnects to the game.
+ *
  *
  */
 Session.prototype.loadClients = function () {
     var clientNames = this.clients.map(function (client) {
         return client.name;
     });
+
 
     this.clients.forEach(function (client) {
 
@@ -50,13 +58,19 @@ Session.prototype.loadClients = function () {
 
         // on socket disconnect
         client.socket.on(SOCKETEVENTS.DISCONNECT, function () {
-            client.disconnected = true;
-            logger.log("#Session: Client", client.name, "disconnected, don't know what to do");
+            logger.log("#Session: Client", client.name, "disconnected, eliminating him from the game");
+            var player = this.game.players.filter(function (p) {
+                return p.name === client.name;
+            })[0];
+            if (!player) throw new Error("#Session: ERROR: Can't disconnect player", client.name);
+            // FIXME this is a workaround because game.eliminatePlayer wants an object ;P
+            this.game.eliminatePlayer(player.objects[0]);
+
         }.bind(this));
 
         // HANDLE NEW INPUT
         client.socket.on(SOCKETEVENTS.ACTIVITY.NEW_INPUT, function (input) {
-            this.handleClientInput(client.name, input);
+            this.handleClientInput(client, input);
         }.bind(this));
 
     }.bind(this));
@@ -68,101 +82,56 @@ Session.prototype.loadClients = function () {
 
 /**
  * Updates the game and then sends a update to all clients with the changes
- * @param clientName
+ * @param client
  * @param clientInput needs to look like:
  *      {
  *          command: "build",
  *          args: "{\"x\": 0, \"y\": 0}"
  *      }
  */
-Session.prototype.handleClientInput = function (clientName, clientInput) {
+Session.prototype.handleClientInput = function (client, clientInput) {
 
-    console.log("#Session: Sending updated input for", clientName, ":", clientInput);
+    var clientName = client.name;
 
+    //console.log("#Session: Sending updated input for", clientName, ":", clientInput);
     try {
-        this.gameHandler.handleCommand(clientName, clientInput.command, clientInput.params);
-
+        this.game.handleCommand(clientName, clientInput.command, clientInput.params);
     } catch (e) {
         if (e instanceof CommandError) {
             console.error("#Session: Error when handling", clientInput, "for", clientName, ", handling it!");
-            this.clients.forEach(function (client) {
-                client.socket.emit(SOCKETEVENTS.MESSAGE, {type: "error", info: e.message});
-            }.bind(this));
+            client.socket.emit(SOCKETEVENTS.MESSAGE, {type: "error", info: e.message});
         } else {
             console.error("#Session: CRITICAL! NOT RECOGNIZED ERROR! THIS SHOULD NOT HAPPEN!");
             throw e;
         }
         return;
     }
-    logger.log("#Session: Updating clients with new view", Object.keys(this.clients));
 
+    // update both clients with a new view because something probably has changed
+    logger.log("#Session: Updating clients with new view", Object.keys(this.clients));
     this.clients.forEach(function (client) {
-        client.socket.emit(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, this.gameHandler.getViewUpdate());
+        client.socket.emit(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, this.game.getViewUpdate());
     }.bind(this));
 
 };
 
-
 /**
- * Initiates and starts a session and the depending activity
+ *
+ * @param game
  */
-//Session.prototype.start = function start() {
-//
-//    var clientNames = this.clients.map(function (client) {
-//        return client.name;
-//    });
-//    logger.log("#Session: started with those clients:", clientNames);
-//
-//    // now that the activity is set up, send the initial status to the clients
-//    this.clients.forEach(function(client){
-//        //FIXME TODO
-//        var viewData = this.activity.getInitView();
-//        client.socket.emit(SOCKETEVENTS.ACTIVITY.INIT_VIEW, viewData);
-//    }.bind(this));
-//
-//
-//    logger.log("#Session: starting update view routine");
-//    this._intervalReference = setInterval(this._update.bind(this), this.updateInterval);
-//
-//};
+Session.prototype.handleGameEnd = function (game) {
+    var winners = game.players.filter(function (player) {
+        return !player.isEliminated;
+    });
+    console.log("#Session: Game has", winners.length, "winners!");
 
+    var winnerName = winners[0] ? winners[0].name : "Nobody";
 
-/**
- * This gets executed periodically and updates the clients view with the activity data
- * @private
- */
-//Session.prototype._update = function(){
-//
-//    //FIXME TODO
-//    this.activity.processTick();
-//
-//    //FIXME TODO
-//    var viewData = this.activity.getUpdateView();
-//
-//    if(!viewData) return;
-//
-//    //
-//
-//    this.clients.forEach(function(client){
-//        client.socket.emit(SOCKETEVENTS.ACTIVITY.UPDATE_VIEW, viewData);
-//    }.bind(this));
-//
-//};
-
-
-/**
- * Interrupts the session if someone leaves
- * need a way to detect rejoining users and re-start session
- */
-//Session.prototype.pause = function(){
-//    if(!this._intervalReference) {
-//        logger.log("#Session: can't stop session that isnt running");
-//        return;
-//    }
-//    logger.log("#Session: Clearing session update interval!");
-//    clearInterval(this._intervalReference);
-//    delete this._intervalReference;
-//};
+    this.clients.forEach(function(client){
+        client.socket.emit(SOCKETEVENTS.MESSAGE, "Game has ended, winner is " + winnerName);
+        client.socket.removeAllListeners();
+    }.bind(this));
+};
 
 
 module.exports = Session;

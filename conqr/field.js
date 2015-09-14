@@ -1,4 +1,4 @@
-var Ressource = require("./ressourcegenerator");
+var Ressource = require("./ressource");
 var CommandError = require("../utils/commanderror");
 /**
  *

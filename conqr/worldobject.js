@@ -1,5 +1,6 @@
 var Evented = require("../shared/js/mt-event");
-var Ressource = require("./ressourcegenerator");
+var SOCKETEVENTS = require("../shared/socketevents");
+var Ressource = require("./ressource");
 /**
  *
  * @param type
@@ -7,7 +8,7 @@ var Ressource = require("./ressourcegenerator");
  */
 var WorldObject = function (type) {
 
-    //Evented.makeEvented(this);
+    Evented.makeEvented(this);
 
     this.name = type.name;
     this.attack = type.attack;
@@ -64,6 +65,7 @@ WorldObject.prototype.hit = function(damage){
  *
  */
 WorldObject.prototype.destroy = function(){
+    this.emit(SOCKETEVENTS.OBJECTS.OBJECT_DESTROYED, this);
     this.field.removeObject();
     this.owner.removeObject(this);
 };
