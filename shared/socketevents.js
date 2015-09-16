@@ -27,7 +27,8 @@ var socketevents =  {
     ACTIVITY: {
         INIT_VIEW: "init_view",
         UPDATE_VIEW: "update_view",
-        NEW_INPUT: "new_input"
+        NEW_INPUT: "new_input",
+        GAME_ENDED: "game_ended"
     },
     CLIENT: {
         CLICKED_ON_OBJECT: "clicked_on_object",

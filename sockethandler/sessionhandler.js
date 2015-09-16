@@ -32,15 +32,9 @@ SessionHandler.prototype.watch = function (matchmaker) {
  * @param matchData
  */
 SessionHandler.prototype.handleMatch = function (clients) {
-
     logger.log("#SessionHandler recieved a match with", clients.length, "clients");
-
     var session = new Session(clients);
     this.sessions.push(session);
-
-    //session.addClients();
-    //session.start();
-
 };
 
 

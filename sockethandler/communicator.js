@@ -1,4 +1,4 @@
-var io = require('socket.io')();
+var io = require("socket.io")();
 var SOCKETEVENTS = require("../shared/socketevents");
 
 // handling for the queue
@@ -9,7 +9,7 @@ var SessionHandler = require("./sessionhandler");
 // queuehandler will emit "match_found" when it finds a queue match
 var qHandler = new QueueHandler();
 var matchSocket = io.of(SOCKETEVENTS.SOCKET_PATH);
-matchSocket.on(SOCKETEVENTS.CONNECTION, qHandler.getHandlerFunction());
+matchSocket.on(SOCKETEVENTS.CONNECTION, qHandler.handleSocketConnection.bind(qHandler));
 
 var gsHandler = new SessionHandler();
 gsHandler.watch(qHandler);

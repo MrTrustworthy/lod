@@ -1,7 +1,7 @@
 var logger = require("../utils/mt-log")("main-log");
 var DBCONST = require("../utils/constants").DB;
 var Deferred = require("../shared/js/mt-promise");
-var sqlite3 = require('sqlite3').verbose();
+var sqlite3 = require("sqlite3").verbose();
 var fs = require("fs");
 
 

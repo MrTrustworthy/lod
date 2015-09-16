@@ -37,7 +37,7 @@ QueueHandler.prototype = Object.create(Matchmaker.prototype);
  * @param socket
  * @private
  */
-QueueHandler.prototype.__handlerFunction = function (socket) {
+QueueHandler.prototype.handleSocketConnection = function (socket) {
     logger.log("#Queuehandler: Someone connected to the Socket");
 
     // TODO find out how to get the users name from his session
@@ -143,14 +143,6 @@ QueueHandler.prototype.stopChecking = function () {
     delete this.intervalObj;
 };
 
-/**
- * Returns a bound handler function to submit the socket to
- *
- * @returns {function(this:QueueHandler)}
- */
-QueueHandler.prototype.getHandlerFunction = function () {
-    return this.__handlerFunction.bind(this);
-};
 
 
 module.exports = QueueHandler;

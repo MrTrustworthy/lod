@@ -5,7 +5,6 @@
 var ClientDTO = function (name, socket) {
     this.name = name || "default_name" + Math.random().toString();
     this.socket = socket;
-    this.isDisconnected = false;
 };
 
 ClientDTO.prototype.setName = function (name) {
