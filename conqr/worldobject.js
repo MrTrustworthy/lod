@@ -1,6 +1,6 @@
 var Evented = require("../shared/js/mt-event");
 var SOCKETEVENTS = require("../shared/socketevents");
-var Ressource = require("./ressource");
+var CommandError = require("../utils/commanderror");
 /**
  *
  * @param type
@@ -25,6 +25,10 @@ var WorldObject = function (type) {
     this.hasAttacked = false;
 };
 
+WorldObject.VALUES = {
+    ATTACK: "attack",
+    SHIELD: "shield"
+};
 
 /**
  *
@@ -46,6 +50,24 @@ WorldObject.TYPES = {
         attack: 1,
         shield: 1
     }
+};
+
+/**
+ * Improves the worldobject
+ * @param value
+ */
+WorldObject.prototype.improve = function(value){
+
+    // those error checks are kinda duplicated from game.improve
+    if(this.name !== WorldObject.TYPES.TURRET.name){
+        throw new CommandError("Can't improve Object that isn't a turret!");
+    }
+    if(value !== WorldObject.VALUES.ATTACK && value !== WorldObject.VALUES.SHIELD){
+        throw new CommandError("Can't improve Object with other value than 'shield' or 'attack'");
+    }
+
+    this[value]++;
+
 };
 
 

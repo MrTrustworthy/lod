@@ -3,9 +3,13 @@ var SOCKETEVENTS = require("../shared/socketevents");
 //var Activity = require("../activities/activity");
 var Game = require("../conqr/game");
 var CommandError = require("../utils/commanderror");
+var EventHandler = require("../shared/js/mt-event");
+
 
 var Session = function Session(clients) {
     var clientNames, gameConf;
+
+    EventHandler.makeEvented(this);
 
     this.clients = clients instanceof Array ? clients : [clients];
     clientNames = this.loadClients();
@@ -128,9 +132,11 @@ Session.prototype.handleGameEnd = function (game) {
     var winnerName = winners[0] ? winners[0].name : "Nobody";
 
     this.clients.forEach(function(client){
-        client.socket.emit(SOCKETEVENTS.MESSAGE, "Game has ended, winner is " + winnerName);
+        client.socket.emit(SOCKETEVENTS.GAME_ENDED, winnerName);
         client.socket.removeAllListeners();
     }.bind(this));
+
+    this.emit(SOCKETEVENTS.GAME_ENDED, this);
 };
 
 

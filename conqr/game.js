@@ -105,7 +105,8 @@ Game.prototype.handleCommand = function (player, command, params) {
     var exposedCommands = {
         build: this.build,
         end_turn: this.endTurn,
-        attack: this.attack
+        attack: this.attack,
+        improve: this.improve
     };
 
     console.log("#Game: handling command", command, "for player", player, "with args", params);
@@ -160,6 +161,56 @@ Game.prototype.attack = function (player, params) {
     originObj.hasAttacked = true;
 
     originObj.hit(targetObj.attack);
+};
+
+
+/**
+ * Improves a object of the players attack or shield by 1
+ * @param playerName
+ * @param params
+ */
+Game.prototype.improve = function(playerName, params){
+
+    var field, player, where, type;
+
+    //params = {
+    //    position: {
+    //        x: 10,
+    //        y: 10
+    //    },
+    //    type: "shield"
+    //};
+
+    console.info("#Game: Calling improve with params:", params);
+
+    try {
+        where = params.position;
+        type = params.type;
+        // is already errorchecked
+        field = this.map.get(where.x, where.y);
+    }catch(e){
+        if(e instanceof CommandError) throw e;
+        throw new CommandError("The passed command contains invalid parameters");
+    }
+
+    if(type !== WorldObject.VALUES.ATTACK && type !== WorldObject.VALUES.SHIELD){
+        throw new CommandError("Can't improve Object with other value than 'shield' or 'attack'");
+    } else if (!field) {// check if field exists
+        throw new CommandError("This field doesnt exist", where, ":::", this.map);
+        // check if field is free
+    } else if (!field.object) {
+        throw new CommandError("There is no object on this field to improve", field.toString());
+    }else if (field.object.owner.name !== playerName){
+        throw new CommandError("The object on this field doesn't belong to the player");
+    } else if (field.object.name !== WorldObject.TYPES.TURRET.name){
+        throw new CommandError("Can't improve Object that isn't a turret!");
+    }
+
+    // if everything went fine, try to withdraw ressources
+    player = this.getPlayer(playerName);
+    player.removeRessources(new Ressource(Ressource.TYPES[params.type], 1));
+    field.object.improve(params.type);
+
 };
 
 

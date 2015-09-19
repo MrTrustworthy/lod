@@ -35,7 +35,19 @@ SessionHandler.prototype.handleMatch = function (clients) {
     logger.log("#SessionHandler recieved a match with", clients.length, "clients");
     var session = new Session(clients);
     this.sessions.push(session);
+    // once the session has ended, handle it via this.handleMatchEnd
+    session.on(SOCKETEVENTS.GAME_ENDED, this.handleMatchEnd.bind(this));
 };
 
+/**
+ *
+ * @param session
+ */
+SessionHandler.prototype.handleMatchEnd = function(session){
+    console.log("#Sessionhandler: Shutting down session");
+    this.sessions.splice(this.sessions.indexOf(session), 1);
 
+
+
+};
 module.exports = SessionHandler;
